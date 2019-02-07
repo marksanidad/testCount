@@ -1,5 +1,4 @@
 const countDB = require('../Database/countDB');
-const admin = require('firebase-admin');
 
 var postCount = {};
 var postNewData = {};
@@ -15,106 +14,98 @@ let postAddCount = (req, callback) => {
 		|| req.category === "speaker" || req.category === "sponsor") {
 		console.log("category", req.category);
 		postAttendeeCount(req, callback);
-		//postCategoryCount(req, callback);
+		postCategoryCount(req, callback);
 	}
 	else if (req.category === "contacts") {
 		console.log("category", req.category);
+		postAttendeeContact(req, callback);
 		postContact(req, callback);
 	}
 }
 
-let getExistCategory = (res, category, callback) => {
+let getExistCategory = (res, req, callback) => {
 
-	if (category === "exhibitor" || category === "expert") {
+	if (req.category === "exhibitor" || req.category === "expert") {
 		if (Object.keys(res).includes('analytics') === false
 			|| Object.keys(res.analytics).includes("pagevisit") === false
-			|| res.analytics.pagevisit[category] === null
-			|| res.analytics.pagevisit[category] === undefined) {
+			|| res.analytics.pagevisit[req.category] === null
+			|| res.analytics.pagevisit[req.category] === undefined) {
 			console.log("exist", undefined, false)
 			return callback(false)
 		}
 		else {
-			result = res.analytics.pagevisit[category]
+			result = res.analytics.pagevisit[req.category]
 			console.log("res", result, true)
 			return callback(true, result);
 		}
 	}
-	else if (category === "speaker" || category === "sponsor") {
+	else if (req.category === "speaker" || req.category === "sponsor") {
 		if (Object.keys(res).includes('analytics') === false
 			|| Object.keys(res.analytics).includes("material") === false
-			|| res.analytics.material[category] === null
-			|| res.analytics.material[category] === undefined) {
+			|| res.analytics.material[req.category] === null
+			|| res.analytics.material[req.category] === undefined) {
 			console.log("exist", undefined, false)
 			return callback(false)
 		}
 		else {
-			result = res.analytics.material[category]
+			result = res.analytics.material[req.category]
+			console.log("res", result, true)
+			return callback(true, result);
+		}
+	}
+	else if (req.category === "rate" && req.type === "speaker") {
+		var speakerid = (req.name).toLowerCase().replace(/\s+/g, "").replace(/"/g, "");
+		if (Object.keys(res).includes('analytics') === false
+			|| Object.keys(res.analytics).includes(req.category) === false
+			|| res.analytics.rate[req.type] === null
+			|| res.analytics.rate[req.type] === undefined
+			|| res.analytics.rate[req.type][req.agendaid] === null
+			|| res.analytics.rate[req.type][req.agendaid] === undefined
+			|| res.analytics.rate[req.type][req.agendaid][speakerid] === null
+			|| res.analytics.rate[req.type][req.agendaid][speakerid] === undefined) {
+			console.log("exist", undefined, false)
+			return callback(false)
+		}
+		else {
+			result = res.analytics.rate[req.type]
+			console.log("res", result, true)
+			return callback(true, result);
+		}
+	}
+	else if (req.category === "rate" && req.type === "session") {
+		if (Object.keys(res).includes('analytics') === false
+			|| Object.keys(res.analytics).includes(req.category) === false
+			|| res.analytics.rate[req.type] === null
+			|| res.analytics.rate[req.type] === undefined
+			|| res.analytics.rate[req.type][req.agendaid] === null
+			|| res.analytics.rate[req.type][req.agendaid] === undefined) {
+			console.log("exist", undefined, false)
+			return callback(false)
+		}
+		else {
+			result = res.analytics.rate[req.type]
 			console.log("res", result, true)
 			return callback(true, result);
 		}
 	}
 	else {
 		if (Object.keys(res).includes('analytics') === false
-			|| Object.keys(res.analytics).includes(category) === false) {
+			|| Object.keys(res.analytics).includes(req.category) === false) {
 			console.log("exist", undefined, false)
 			return callback(false)
 		}
 		else {
-			result = res.analytics[category]
+			result = res.analytics[req.category]
 			console.log("res", result, true)
 			return callback(true, result);
 		}
 	}
 }
 
-// let getAttendeeCategoryExist = (res, category, callback) => {
-// 	if (category === "exhibitor" || category === "expert") {
-// 		if (Object.keys(res).includes('analytics') === false
-// 			|| Object.keys(res.analytics).includes("pagevisit") === false
-// 			|| res.analytics.pagevisit[category] === null
-// 			|| res.analytics.pagevisit[category] === undefined) {
-// 			console.log("exist", undefined, false)
-// 			return callback(false)
-// 		}
-// 		else {
-// 			result = res.analytics.pagevisit[category]
-// 			console.log("res", result, true)
-// 			return callback(true, result);
-// 		}
-// 	}
-// 	else if (category === "speaker" || category === "sponsor") {
-// 		if (Object.keys(res).includes('analytics') === false
-// 			|| Object.keys(res.analytics).includes("material") === false
-// 			|| res.analytics.material[category] === null
-// 			|| res.analytics.material[category] === undefined) {
-// 			console.log("exist", undefined, false)
-// 			return callback(false)
-// 		}
-// 		else {
-// 			result = res.analytics.material[category]
-// 			console.log("res", result, true)
-// 			return callback(true, result);
-// 		}
-// 	}
-// 	else {
-// 		if (Object.keys(res).includes('analytics') === false
-// 			|| Object.keys(res.analytics).includes(category) === false) {
-// 			console.log("exist", undefined, false)
-// 			return callback(false)
-// 		}
-// 		else {
-// 			result = res.analytics[category]
-// 			console.log("res", result, true)
-// 			return callback(true, result);
-// 		}
-// 	}
-// }
-
 let postCategoryCount = (req, callback) => {
-	category = req.category;
 	countDB.getResultCount(req.event, (err, res) => {
 
-		getExistCategory(res, category, (exist, result) => {
+		getExistCategory(res, req, (exist, result) => {
 			if (err) {
 				throw err
 			}
@@ -166,10 +157,9 @@ let postCategoryCount = (req, callback) => {
 }
 
 let postContact = (req, callback) => {
-	category = req.category;
 	countDB.getResultCount(req.event, (err, res) => {
 
-		getExistCategory(res, category, (exist, result) => {
+		getExistCategory(res, req, (exist, result) => {
 			if (err) {
 				throw err
 			}
@@ -210,12 +200,74 @@ let postContact = (req, callback) => {
 }
 
 let postAttendeeCount = (req, callback) => {
-	countDB.getResultAttendeeCount(req.userid, (err, res) => {
-		if (err === true){
-			return callback(true, res);
+	category = req.category;
+	countDB.getResultAttendeeCount(req.userid, (err, res, message) => {
+		if (err === true) {
+			return callback(true, message);
 		}
 		else {
-			return callback(false, res);
+			getExistCategory(res, req, (exist, result) => {
+				if (err) {
+					throw err
+				}
+				else if ((exist === true && Object.keys(result).includes(req.id) === true)
+					|| (exist === true && category === "speaker") || (exist === true && category === "sponsor")) {
+					console.log("res", result)
+					if (category === "speaker" || category === "sponsor") {
+						count = result.count;
+					}
+					else {
+						count = result[req.id].count;
+					}
+					addCount = count + 1;
+
+					var finalCount = {
+						count: addCount,
+					}
+
+					countDB.updateAttendeeCount(finalCount, req, (err, res) => {
+						if (err) throw err;
+					})
+				}
+				else if (exist === false || Object.keys(result).includes(req.id) === false) {
+					countDB.setAttendeeCount(req, err => {
+						if (err) throw err;
+					})
+				}
+			})
+		}
+	})
+}
+
+let postAttendeeContact = (req, callback) => {
+	countDB.getResultAttendeeCount(req.userid, (err, res, message) => {
+		if (err === true) {
+			return callback(false, message);
+		}
+		else {
+			getExistCategory(res, req, (exist, result) => {
+				if (err) {
+					throw err
+				}
+				else if (exist === true) {
+					console.log("res", result)
+					count = result.count;
+					addCount = count + 1;
+
+					var finalCount = {
+						count: addCount,
+					}
+
+					countDB.updateAttendeeCount(finalCount, req, (err, res) => {
+						if (err) throw err;
+					})
+				}
+				else if (exist === false) {
+					countDB.setAttendeeCount(req, err => {
+						if (err) throw err;
+					})
+				}
+			})
 		}
 	})
 }
@@ -224,5 +276,5 @@ module.exports = {
 	postAddCount: postAddCount,
 	postCategoryCount: postCategoryCount,
 	postAttendeeCount: postAttendeeCount,
-	// postRate: postRate
+	getExistCategory: getExistCategory,
 }

@@ -12,10 +12,10 @@ let getResultAttendeeCount = (userid, callback) => {
 		let test = data.val();
 		console.log("test",test)
 		if (test === null || test === undefined) {
-			return callback(true, {error: "userid not exists!"})
+			return callback(true, null, {message: "userid not exists!"})
 		}
 		else {
-			return callback(false, {result: "userid exists"})
+			return callback(false, test, {message: "userid exists"})
 		}
 	})
 }
@@ -148,6 +148,56 @@ let updateTotalCount = (req, exist, callback) => {
 		})
 	}
 }
+let setAttendeeCount = (req, callback) => {
+
+	var catURL = '';
+	var setArray = {
+		name: req.name,
+		count: 1
+	};
+
+	if (req.category === "camfilter") {
+		catURL = '/users/attendee/' + req.userid + '/analytics/' + req.category + '/' + req.id;
+	}
+	else if (req.category === "contacts") {
+		catURL = '/users/attendee/' + req.userid + '/analytics/' + req.category;
+		setArray = {
+			count: 1
+		};
+	}
+	else if (req.category === "exhibitor" || req.category === "expert") {
+		catURL = '/users/attendee/' + req.userid + '/analytics/pagevisit/' + req.category  + '/' + req.id;
+	}
+	else if (req.category === "speaker" || req.category === "sponsor") {
+		catURL = '/users/attendee/' + req.userid + '/analytics/material/' + req.category;
+		setArray = {
+			count: 1
+		};
+	}
+
+	admin.database().ref(catURL).set(setArray);
+	return callback(false);
+
+}
+
+let updateAttendeeCount = (finalCount, req, callback) => {
+	var catURL = '';
+	if (req.category === "camfilter") {
+		catURL = '/users/attendee/' + req.userid + '/analytics/' + req.category + '/' + req.id;
+	}
+	else if (req.category === "contacts") {
+		catURL = '/users/attendee/' + req.userid + '/analytics/' + req.category;
+	}
+	else if (req.category === "exhibitor" || req.category === "expert") {
+		catURL = '/users/attendee/' + req.userid + '/analytics/pagevisit/' + req.category + '/' + req.id;
+	}
+	else if (req.category === "speaker" || req.category === "sponsor") {
+		catURL = '/users/attendee/' + req.userid + '/analytics/material/' + req.category;
+	}
+
+	admin.database().ref(catURL).update(finalCount)
+	return callback(false);
+}
 
 module.exports = {
 	getResultCount: getResultCount,
@@ -155,4 +205,6 @@ module.exports = {
 	setCount: setCount,
 	updateTotalCount: updateTotalCount,
 	getResultAttendeeCount: getResultAttendeeCount,
+	updateAttendeeCount : updateAttendeeCount,
+	setAttendeeCount : setAttendeeCount,
 }
