@@ -1,6 +1,6 @@
 const rateDB = require('../Database/rateDB')
 const countDB = require('../Database/countDB')
-const countFunc = require('../Functions/countFunction')
+const existFunc = require('../Functions/getExistFunction')
 
 var newRate = {};
 var postNewData = {};
@@ -15,7 +15,7 @@ let postRate = (req, callback) => {
             if (req.type === "speaker") {
                 var speakerid = (req.name).toLowerCase().replace(/\s+/g, "").replace(/"/g, "");
 
-                countFunc.getExistCategory(res, req, (exist, result) => {
+                existFunc.getExistCategory(res, req, (exist, result) => {
                     if (err) {
                         throw err
                     }
@@ -54,7 +54,7 @@ let postRate = (req, callback) => {
             }
 
             else if (req.type === "session") {
-                countFunc.getExistCategory(res, req, (exist, result) => {
+                existFunc.getExistCategory(res, req, (exist, result) => {
                     if (err) {
                         throw err
                     }
@@ -89,11 +89,6 @@ let postRate = (req, callback) => {
             }
         }
     })
-
-
-
-
-
 }
 
 module.exports = {

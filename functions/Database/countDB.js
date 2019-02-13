@@ -148,8 +148,12 @@ let updateTotalCount = (req, exist, callback) => {
 			}
 		})
 	}
+
+	return callback(false);
 }
+
 let setAttendeeCount = (req, callback) => {
+	console.log("set attendee")
 
 	var catURL = '';
 	var setArray = {
@@ -158,19 +162,19 @@ let setAttendeeCount = (req, callback) => {
 	};
 
 	if (req.category === "camfilter") {
-		catURL = '/users/attendee/' + req.userid + '/analytics/' + req.category + '/' + req.id;
+		catURL = '/users/attendee/' + req.userid + '/analytics/' + req.event + '/' + req.category + '/' + req.id;
 	}
 	else if (req.category === "contacts") {
-		catURL = '/users/attendee/' + req.userid + '/analytics/' + req.category;
+		catURL = '/users/attendee/' + req.userid + '/analytics/' + req.event + '/' + req.category;
 		setArray = {
 			count: 1
 		};
 	}
 	else if (req.category === "exhibitor" || req.category === "expert" || req.category === "partner") {
-		catURL = '/users/attendee/' + req.userid + '/analytics/pagevisit/' + req.category + '/' + req.id;
+		catURL = '/users/attendee/' + req.userid + '/analytics/' + req.event + '/pagevisit/' + req.category + '/' + req.id;
 	}
 	else if (req.category === "speaker" || req.category === "sponsor") {
-		catURL = '/users/attendee/' + req.userid + '/analytics/material/' + req.category;
+		catURL = '/users/attendee/' + req.userid + '/analytics/' + req.event +'/material/' + req.category;
 		setArray = {
 			count: 1
 		};
@@ -182,18 +186,20 @@ let setAttendeeCount = (req, callback) => {
 }
 
 let updateAttendeeCount = (finalCount, req, callback) => {
+	console.log("update attendee")
+
 	var catURL = '';
 	if (req.category === "camfilter") {
-		catURL = '/users/attendee/' + req.userid + '/analytics/' + req.category + '/' + req.id;
+		catURL = '/users/attendee/' + req.userid + '/analytics/' + req.event + '/' + req.category + '/' + req.id;
 	}
 	else if (req.category === "contacts") {
-		catURL = '/users/attendee/' + req.userid + '/analytics/' + req.category;
+		catURL = '/users/attendee/' + req.userid + '/analytics/' + req.event + '/' + req.category;
 	}
 	else if (req.category === "exhibitor" || req.category === "expert" || req.category === "partner") {
-		catURL = '/users/attendee/' + req.userid + '/analytics/pagevisit/' + req.category + '/' + req.id;
+		catURL = '/users/attendee/' + req.userid + '/analytics/' + req.event + '/pagevisit/' + req.category + '/' + req.id;
 	}
 	else if (req.category === "speaker" || req.category === "sponsor") {
-		catURL = '/users/attendee/' + req.userid + '/analytics/material/' + req.category;
+		catURL = '/users/attendee/' + req.userid + '/analytics/' + req.event +'/material/' + req.category;
 	}
 
 	admin.database().ref(catURL).update(finalCount)
