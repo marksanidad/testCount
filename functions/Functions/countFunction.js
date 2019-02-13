@@ -11,7 +11,7 @@ var category = '';
 let postAddCount = (req, callback) => {
 
 	if (req.category === "camfilter" || req.category === "exhibitor" || req.category === "expert"
-		|| req.category === "speaker" || req.category === "sponsor") {
+		|| req.category === "speaker" || req.category === "sponsor" || req.category === "partner") {
 		console.log("category", req.category);
 		postAttendeeCount(req, callback);
 		postCategoryCount(req, callback);
@@ -25,7 +25,7 @@ let postAddCount = (req, callback) => {
 
 let getExistCategory = (res, req, callback) => {
 
-	if (req.category === "exhibitor" || req.category === "expert") {
+	if (req.category === "exhibitor" || req.category === "expert" || req.category === "partner") {
 		if (Object.keys(res).includes('analytics') === false
 			|| Object.keys(res.analytics).includes("pagevisit") === false
 			|| res.analytics.pagevisit[req.category] === null

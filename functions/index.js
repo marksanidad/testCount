@@ -18,7 +18,7 @@ app.use((req, res, next) => {
     res.setHeader('Cache-Control', 'no-cache');
     next();
 });
- 
+  
 app.post(['/postCount/:event/:userid/:category/:id/:name'],appRoute);
 app.post(['/postRate/:category/:type/:userid/:agendaid/:name/:rate'],appRoute);
 

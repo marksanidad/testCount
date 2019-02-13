@@ -10,12 +10,12 @@ let getResultCount = (event, callback) => {
 let getResultAttendeeCount = (userid, callback) => {
 	admin.database().ref('users/attendee/' + userid).once('value', data => {
 		let test = data.val();
-		console.log("test",test)
+		console.log("test", test)
 		if (test === null || test === undefined) {
-			return callback(true, null, {message: "userid not exists!"})
+			return callback(true, null, { message: "userid not exists!" })
 		}
 		else {
-			return callback(false, test, {message: "userid exists"})
+			return callback(false, test, { message: "userid exists" })
 		}
 	})
 }
@@ -28,7 +28,7 @@ let updateCount = (finalCount, req, callback) => {
 	else if (req.category === "contacts") {
 		catURL = '/GANAPP/' + req.event + '/analytics/' + req.category;
 	}
-	else if (req.category === "exhibitor" || req.category === "expert") {
+	else if (req.category === "exhibitor" || req.category === "expert" || req.category === "partner") {
 		catURL = '/GANAPP/' + req.event + '/analytics/pagevisit/' + req.category + '/' + req.id;
 	}
 	else if (req.category === "speaker" || req.category === "sponsor") {
@@ -57,7 +57,7 @@ let setCount = (req, callback) => {
 			totalCount: 1
 		};
 	}
-	else if (req.category === "exhibitor" || req.category === "expert") {
+	else if (req.category === "exhibitor" || req.category === "expert" || req.category === "partner") {
 		catURL = '/GANAPP/' + req.event + '/analytics/pagevisit/' + req.category + '/' + req.id;
 	}
 	else if (req.category === "speaker" || req.category === "sponsor") {
@@ -70,10 +70,11 @@ let setCount = (req, callback) => {
 }
 
 let updateTotalCount = (req, exist, callback) => {
-	if (req.category === "exhibitor" || req.category === "expert" || req.category === "speaker" || req.category === "sponsor") {
+	if (req.category === "exhibitor" || req.category === "expert" || req.category === "partner"
+		|| req.category === "speaker" || req.category === "sponsor") {
 		var catURL = '';
 
-		if (req.category === "exhibitor" || req.category === "expert") {
+		if (req.category === "exhibitor" || req.category === "expert" || req.category === "partner") {
 			catURL = '/analytics/pagevisit/';
 		}
 		else if (req.category === "speaker" || req.category === "sponsor") {
@@ -165,8 +166,8 @@ let setAttendeeCount = (req, callback) => {
 			count: 1
 		};
 	}
-	else if (req.category === "exhibitor" || req.category === "expert") {
-		catURL = '/users/attendee/' + req.userid + '/analytics/pagevisit/' + req.category  + '/' + req.id;
+	else if (req.category === "exhibitor" || req.category === "expert" || req.category === "partner") {
+		catURL = '/users/attendee/' + req.userid + '/analytics/pagevisit/' + req.category + '/' + req.id;
 	}
 	else if (req.category === "speaker" || req.category === "sponsor") {
 		catURL = '/users/attendee/' + req.userid + '/analytics/material/' + req.category;
@@ -188,7 +189,7 @@ let updateAttendeeCount = (finalCount, req, callback) => {
 	else if (req.category === "contacts") {
 		catURL = '/users/attendee/' + req.userid + '/analytics/' + req.category;
 	}
-	else if (req.category === "exhibitor" || req.category === "expert") {
+	else if (req.category === "exhibitor" || req.category === "expert" || req.category === "partner") {
 		catURL = '/users/attendee/' + req.userid + '/analytics/pagevisit/' + req.category + '/' + req.id;
 	}
 	else if (req.category === "speaker" || req.category === "sponsor") {
@@ -205,6 +206,6 @@ module.exports = {
 	setCount: setCount,
 	updateTotalCount: updateTotalCount,
 	getResultAttendeeCount: getResultAttendeeCount,
-	updateAttendeeCount : updateAttendeeCount,
-	setAttendeeCount : setAttendeeCount,
+	updateAttendeeCount: updateAttendeeCount,
+	setAttendeeCount: setAttendeeCount,
 }
