@@ -19,8 +19,8 @@ app.use((req, res, next) => {
     next();
 });
   
-app.post(['/postCount/:event/:userid/:category/:id/:name'],appRoute);
-app.post(['/postRate/:event/:category/:type/:userid/:agendaid/:name/:rate'],appRoute);
+app.post(['/postCount'],appRoute);
+app.post(['/postRate'],appRoute);
 
 const analytics = functions.https.onRequest(app);
 
